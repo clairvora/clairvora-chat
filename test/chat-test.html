@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clairvora Chat Test</title>
+  <style>
+    :root {
+      /* Clairvora Brand Colors */
+      --primary: #fd5631;
+      --primary-hover: #fd3509;
+      --secondary: #f5f4f8;
+      --success: #07c98b;
+      --info: #3c76f2;
+      --warning: #fdbc31;
+      --danger: #f23c49;
+      --dark: #293951;
+      --body-color: #666276;
+      --border-color: #efecf3;
+      --gray-100: #f8f9fa;
+      --gray-200: #e9ecef;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--secondary);
+      color: var(--body-color);
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: var(--dark);
+    }
+    .config {
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
+    }
+    .config label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: var(--body-color);
+    }
+    .config input, .config select {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--dark);
+    }
+    .config button {
+      width: 100%;
+      padding: 12px;
+      background: var(--primary);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .config button:hover {
+      background: var(--primary-hover);
+    }
+    .config button:disabled {
+      background: var(--gray-200);
+      color: var(--body-color);
+      cursor: not-allowed;
+    }
+    .status {
+      text-align: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .status.connected {
+      background: rgba(7, 201, 139, 0.15);
+      color: var(--success);
+    }
+    .status.disconnected {
+      background: rgba(242, 60, 73, 0.15);
+      color: var(--danger);
+    }
+    .status.connecting {
+      background: rgba(253, 188, 49, 0.15);
+      color: #b38600;
+    }
+    .chat-box {
+      background: #fff;
+      border-radius: 8px;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border: 1px solid var(--border-color);
+    }
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 15px;
+      background: var(--gray-100);
+    }
+    .message {
+      margin-bottom: 12px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      max-width: 80%;
+    }
+    .message.client {
+      background: var(--primary);
+      color: #fff;
+      margin-left: auto;
+    }
+    .message.advisor {
+      background: var(--dark);
+      color: #fff;
+    }
+    .message.system {
+      background: var(--gray-200);
+      text-align: center;
+      max-width: 100%;
+      font-size: 12px;
+      color: var(--body-color);
+    }
+    .message .meta {
+      font-size: 11px;
+      opacity: 0.7;
+      margin-bottom: 4px;
+    }
+    .message .content {
+      word-wrap: break-word;
+    }
+    .typing-indicator {
+      padding: 5px 15px;
+      font-size: 12px;
+      color: var(--body-color);
+      font-style: italic;
+      min-height: 24px;
+      background: var(--gray-100);
+    }
+    .input-area {
+      display: flex;
+      padding: 10px;
+      border-top: 1px solid var(--border-color);
+      gap: 10px;
+      background: #fff;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      background: #fff;
+      color: var(--dark);
+    }
+    .input-area input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .input-area button {
+      padding: 12px 24px;
+      background: var(--primary);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .input-area button:hover {
+      background: var(--primary-hover);
+    }
+    .input-area button:disabled {
+      background: var(--gray-200);
+      color: var(--body-color);
+      cursor: not-allowed;
+    }
+    .participants {
+      padding: 10px 15px;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 12px;
+      color: var(--body-color);
+      background: #fff;
+    }
+    .participants span {
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(7, 201, 139, 0.15);
+      border-radius: 10px;
+      margin-right: 5px;
+      color: var(--success);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Clairvora Chat Test</h1>
+
+    <div class="config" id="configPanel">
+      <label for="serverUrl">WebSocket Server URL</label>
+      <input type="text" id="serverUrl" value="wss://clairvora-chat.jason-brindel.workers.dev/chat/test-room-1" />
+
+      <label for="userName">Your Name</label>
+      <input type="text" id="userName" value="Test User" />
+
+      <label for="userType">User Type</label>
+      <select id="userType">
+        <option value="client">Client</option>
+        <option value="advisor">Advisor</option>
+      </select>
+
+      <button id="connectBtn" onclick="connect()">Connect</button>
+    </div>
+
+    <div class="status disconnected" id="status">Disconnected</div>
+
+    <div class="chat-box">
+      <div class="participants" id="participants">No one connected</div>
+      <div class="messages" id="messages"></div>
+      <div class="typing-indicator" id="typingIndicator"></div>
+      <div class="input-area">
+        <input type="text" id="messageInput" placeholder="Type a message..." disabled onkeypress="handleKeyPress(event)" oninput="handleTyping()" />
+        <button id="sendBtn" onclick="sendMessage()" disabled>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ws = null;
+    let userId = null;
+    let typingTimeout = null;
+    let isTyping = false;
+
+    function connect() {
+      const serverUrl = document.getElementById('serverUrl').value;
+      const userName = document.getElementById('userName').value;
+      const userType = document.getElementById('userType').value;
+
+      updateStatus('connecting', 'Connecting...');
+      document.getElementById('connectBtn').disabled = true;
+
+      try {
+        ws = new WebSocket(serverUrl);
+
+        ws.onopen = () => {
+          console.log('WebSocket connected');
+          // Send auth message
+          ws.send(JSON.stringify({
+            type: 'auth',
+            userName: userName,
+            userType: userType
+          }));
+        };
+
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          console.log('Received:', data);
+          handleMessage(data);
+        };
+
+        ws.onclose = (event) => {
+          console.log('WebSocket closed:', event.code, event.reason);
+          updateStatus('disconnected', `Disconnected (${event.code})`);
+          document.getElementById('connectBtn').disabled = false;
+          document.getElementById('connectBtn').textContent = 'Reconnect';
+          document.getElementById('messageInput').disabled = true;
+          document.getElementById('sendBtn').disabled = true;
+          ws = null;
+        };
+
+        ws.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          updateStatus('disconnected', 'Connection error');
+        };
+
+      } catch (error) {
+        console.error('Failed to connect:', error);
+        updateStatus('disconnected', 'Failed to connect');
+        document.getElementById('connectBtn').disabled = false;
+      }
+    }
+
+    function handleMessage(data) {
+      switch (data.type) {
+        case 'auth_success':
+          userId = data.userId;
+          updateStatus('connected', 'Connected as ' + document.getElementById('userName').value);
+          document.getElementById('messageInput').disabled = false;
+          document.getElementById('sendBtn').disabled = false;
+          document.getElementById('configPanel').style.display = 'none';
+          updateParticipants(data.participants);
+          break;
+
+        case 'auth_error':
+          updateStatus('disconnected', 'Auth failed: ' + data.message);
+          ws.close();
+          break;
+
+        case 'history':
+          // Display message history
+          if (data.messages && data.messages.length > 0) {
+            addSystemMessage(`Loaded ${data.messages.length} previous messages`);
+            data.messages.forEach(msg => {
+              addChatMessage(msg.user_name, msg.content, msg.user_type, msg.timestamp);
+            });
+          }
+          break;
+
+        case 'message':
+          addChatMessage(data.userName, data.content, data.userType, data.timestamp);
+          break;
+
+        case 'typing':
+          handleTypingIndicator(data);
+          break;
+
+        case 'presence':
+          handlePresence(data);
+          break;
+
+        case 'pong':
+          console.log('Pong received, latency:', Date.now() - data.timestamp, 'ms');
+          break;
+
+        case 'error':
+          console.error('Server error:', data.message);
+          addSystemMessage('Error: ' + data.message);
+          break;
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const content = input.value.trim();
+
+      if (!content || !ws) return;
+
+      ws.send(JSON.stringify({
+        type: 'message',
+        content: content
+      }));
+
+      input.value = '';
+
+      // Stop typing indicator
+      if (isTyping) {
+        isTyping = false;
+        ws.send(JSON.stringify({ type: 'typing', isTyping: false }));
+      }
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === 'Enter') {
+        sendMessage();
+      }
+    }
+
+    function handleTyping() {
+      if (!ws) return;
+
+      // Send typing indicator
+      if (!isTyping) {
+        isTyping = true;
+        ws.send(JSON.stringify({ type: 'typing', isTyping: true }));
+      }
+
+      // Reset timeout
+      clearTimeout(typingTimeout);
+      typingTimeout = setTimeout(() => {
+        isTyping = false;
+        ws.send(JSON.stringify({ type: 'typing', isTyping: false }));
+      }, 2000);
+    }
+
+    function handleTypingIndicator(data) {
+      const indicator = document.getElementById('typingIndicator');
+      if (data.isTyping) {
+        indicator.textContent = `${data.userType === 'advisor' ? 'Advisor' : 'Client'} is typing...`;
+      } else {
+        indicator.textContent = '';
+      }
+    }
+
+    function handlePresence(data) {
+      const action = data.status === 'online' ? 'joined' : 'left';
+      addSystemMessage(`${data.userName} (${data.userType}) ${action} the chat`);
+    }
+
+    function updateParticipants(participants) {
+      const el = document.getElementById('participants');
+      if (!participants || participants.length === 0) {
+        el.textContent = 'No one else connected';
+        return;
+      }
+      el.innerHTML = 'In chat: ' + participants.map(p =>
+        `<span>${p.userName} (${p.userType})</span>`
+      ).join('');
+    }
+
+    function addChatMessage(userName, content, userType, timestamp) {
+      const messages = document.getElementById('messages');
+      const time = new Date(timestamp).toLocaleTimeString();
+
+      const div = document.createElement('div');
+      div.className = `message ${userType}`;
+      div.innerHTML = `
+        <div class="meta">${userName} - ${time}</div>
+        <div class="content">${escapeHtml(content)}</div>
+      `;
+
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function addSystemMessage(text) {
+      const messages = document.getElementById('messages');
+      const div = document.createElement('div');
+      div.className = 'message system';
+      div.innerHTML = `<div class="content">${escapeHtml(text)}</div>`;
+      messages.appendChild(div);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function updateStatus(state, text) {
+      const el = document.getElementById('status');
+      el.className = `status ${state}`;
+      el.textContent = text;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Heartbeat to keep connection alive
+    setInterval(() => {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'ping' }));
+      }
+    }, 30000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "clairvora-chat",
+  "account_id": "db05e74e773d91c84692ba064111c43c",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-01-06",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Durable Objects configuration
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "CHAT_ROOM",
+        "class_name": "ChatRoom"
+      }
+    ]
+  },
+
+  // SQLite storage for Durable Objects
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["ChatRoom"]
+    }
+  ],
+
+  // Environment variables (secrets added via wrangler secret put)
+  "vars": {
+    "ENVIRONMENT": "development",
+    "PHP_API_URL": "https://clairvora.com/api/chat"
+  },
+
+  // Observability
+  "observability": {
+    "enabled": true
+  }
+}
